@@ -4,27 +4,19 @@ View Overview - Dashboard Principal Refatorado (Design System)
 
 import streamlit as st
 import pandas as pd
-from typing import Any, Optional
 from components.cards import render_kpi_grid
 from components.typography import render_page_header, render_section_title
-from utils.theme_manager import ThemeManager
+
 
 def render_overview_view(
-    analytics: Any,
     df_all_active: pd.DataFrame,
     churn_data: dict,
     expenses_summary: dict,
-    theme_manager: Optional[ThemeManager] = None
 ) -> None:
-    
-    if theme_manager is None:
-        theme_manager = ThemeManager()
-    
-    # 1. Uso do Design System para o Cabeçalho (Fim do HTML sujo na View)
+
     render_page_header(
         title="📊 Dashboard Principal",
         subtitle=f"Visão geral da gestão escolar - {len(df_all_active)} alunos ativos no sistema",
-        theme_manager=theme_manager
     )
     
     # Calcular métricas globais
@@ -55,12 +47,11 @@ def render_overview_view(
             "variant": "info"
         }
     ]
-    render_kpi_grid(metrics, cols, theme_manager)
-    
-    st.markdown("<br>", unsafe_allow_html=True)
-    
-    # 2. Uso do Design System para Título de Seção
-    render_section_title("📈 Distribuição por Segmento", theme_manager=theme_manager)
+    render_kpi_grid(metrics, cols)
+
+    st.write("")
+
+    render_section_title("📈 Distribuição por Segmento")
     
     if not df_all_active.empty:
         segment_summary = df_all_active.groupby('segment').agg({

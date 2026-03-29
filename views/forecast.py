@@ -1,10 +1,11 @@
 import streamlit as st
 from datetime import datetime
-from typing import Any, Optional
+from typing import Any
 import pandas as pd
 
 from components.charts import create_premium_area
-from utils.theme_manager import ThemeManager
+from components.typography import render_page_header, render_section_title
+
 
 def render_forecast_view(
     financial_svc: Any,
@@ -12,22 +13,10 @@ def render_forecast_view(
     df_active: pd.DataFrame,
     months_to_forecast: int = 6,
     delinquency_rate: float = 0.10,
-    theme_manager: Optional[ThemeManager] = None
 ) -> None:
-    if theme_manager is None:
-        theme_manager = ThemeManager()
-
-    theme = theme_manager.get_current_theme()
-    colors = theme_manager.get_theme_colors(theme)
-
-    st.markdown(
-        f"""
-        <h2 style="color: {colors['text_primary']}; font-size: 1.5rem; font-weight: 600; margin-bottom: 0.5rem;">
-        🔮 Projeção Financeira</h2>
-        <p style="color: {colors['text_secondary']}; font-size: 0.875rem; margin-bottom: 2rem;">
-        Projeção de fluxo de caixa para os próximos {months_to_forecast} meses</p>
-        """,
-        unsafe_allow_html=True
+    render_page_header(
+        title="🔮 Projeção Financeira",
+        subtitle=f"Projeção de fluxo de caixa para os próximos {months_to_forecast} meses",
     )
 
     # Note: Usando os novos serviços desmembrados (Fase 2)
@@ -41,24 +30,17 @@ def render_forecast_view(
         st.warning("Sem dados para projeção.")
         return
 
-    st.markdown(
-        f"""<h4 style="color: {colors['text_primary']}; font-size: 1.125rem; margin-bottom: 1rem;">
-        📈 Projeção de Receita vs Risco</h4>""", unsafe_allow_html=True
-    )
+    render_section_title("📈 Projeção de Receita vs Risco")
 
     fig_forecast = create_premium_area(
         data=df_forecast,
         x_col='Mês',
         y_cols=['Receita Projetada (Líquida)', 'Risco de Inadimplência'],
-        theme=theme
     )
     st.plotly_chart(fig_forecast, use_container_width=True, config={'displayModeBar': False})
 
-    st.markdown("<br>", unsafe_allow_html=True)
-    st.markdown(
-        f"""<h4 style="color: {colors['text_primary']}; font-size: 1.125rem; margin-bottom: 1rem;">
-        📋 Planilha de Projeção</h4>""", unsafe_allow_html=True
-    )
+    st.write("")
+    render_section_title("📋 Planilha de Projeção")
 
     st.dataframe(
         df_forecast.style.format({

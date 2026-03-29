@@ -4,29 +4,19 @@ View Financeiro - Performance e Custos Refatorado (Design System)
 
 import streamlit as st
 import pandas as pd
-from typing import Any, Optional
 from components.cards import render_kpi_grid
 from components.charts import create_premium_pie, create_premium_bar
 from components.typography import render_page_header, render_section_title
-from utils.theme_manager import ThemeManager
+
 
 def render_financial_view(
-    analytics: Any,
     df_filtered: pd.DataFrame,
     expenses_summary: dict,
-    theme_manager: Optional[ThemeManager] = None
 ) -> None:
-    
-    if theme_manager is None:
-        theme_manager = ThemeManager()
-    
-    theme = theme_manager.get_current_theme()
-    
-    # 1. Uso do Design System
+
     render_page_header(
         title="💰 Performance Financeira",
         subtitle="Análise detalhada de receitas e custos por segmento educacional",
-        theme_manager=theme_manager
     )
     
     if df_filtered is None or df_filtered.empty:
@@ -60,15 +50,14 @@ def render_financial_view(
             "help_text": "Soma das mensalidades líquidas do recorte selecionado",
         },
     ]
-    render_kpi_grid(metrics, cols, theme_manager=theme_manager)
+    render_kpi_grid(metrics, cols)
 
-    st.markdown("<br>", unsafe_allow_html=True)
+    st.write("")
 
     col_g1, col_g2 = st.columns(2)
 
     with col_g1:
-        # 2. Uso do Design System
-        render_section_title("📊 Composição de Custos", theme_manager=theme_manager)
+        render_section_title("📊 Composição de Custos")
         
         details = expenses_summary.get("details")
         if isinstance(details, pd.DataFrame) and not details.empty:
@@ -77,15 +66,13 @@ def render_financial_view(
                 values_col="valor",
                 names_col="categoria",
                 hole=0.4,
-                theme=theme,
             )
             st.plotly_chart(fig_costs, use_container_width=True, config={"displayModeBar": False})
         else:
             st.info("Sem dados de custos para exibir.")
 
     with col_g2:
-        # 3. Uso do Design System
-        render_section_title("📈 Receita por Série", theme_manager=theme_manager)
+        render_section_title("📈 Receita por Série")
         
         if "grade" in df_filtered.columns:
             df_grade = df_filtered.groupby("grade")["net_tuition"].sum().reset_index()
@@ -93,7 +80,6 @@ def render_financial_view(
                 data=df_grade,
                 x_col="grade",
                 y_col="net_tuition",
-                theme=theme,
                 color_discrete_sequence=True,
             )
             st.plotly_chart(fig_grade, use_container_width=True, config={"displayModeBar": False})
