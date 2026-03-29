@@ -1,0 +1,79 @@
+/* CESOL Pro - CSS Global Base
+ * Importado dinamicamente via ThemeManager
+ */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+:root {
+  /* Família tipográfica */
+  --font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  
+  /* Escala tipográfica modular (ratio 1.25) */
+  --text-xs: 0.75rem;      /* 12px - Labels */
+  --text-sm: 0.875rem;     /* 14px - Corpo secundário */
+  --text-base: 1rem;       /* 16px - Corpo */
+  --text-lg: 1.125rem;     /* 18px - H3 */
+  --text-xl: 1.25rem;      /* 20px - H2 */
+  --text-2xl: 1.5rem;      /* 24px - H1 */
+  --text-3xl: 1.875rem;    /* 30px - Display */
+  
+  /* Pesos */
+  --font-normal: 400;
+  --font-medium: 500;
+  --font-semibold: 600;
+  --font-bold: 700;
+  
+  /* Altura de linha */
+  --leading-tight: 1.25;
+  --leading-snug: 1.375;
+  --leading-normal: 1.5;
+  
+  /* Espaçamento */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+  
+  /* Bordas */
+  --radius-sm: 6px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
+  
+  /* Animações */
+  --transition-fast: 150ms ease;
+  --transition-base: 250ms ease;
+  --transition-slow: 350ms ease;
+}
+
+/* Reset Streamlit específico */
+.stApp {
+  font-family: var(--font-family) !important;
+}
+
+/* Esconder menu hamburger padrão se desejado */
+#MainMenu {visibility: hidden;}
+
+/* Footer Streamlit */
+footer {visibility: hidden;}
+
+/* Scrollbar estilizada */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border-subtle, #CBD5E1);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--border-focus, #94A3B8);
+}

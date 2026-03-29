@@ -1,0 +1,60 @@
+/* CESOL Pro - Light Theme "Scholar Pro" */
+
+[data-theme="light"] .stApp {
+  background-color: #F8FAFC;
+  color: #0F172A;
+}
+
+[data-theme="light"] .stSidebar {
+  background-color: #FFFFFF;
+  border-right: 1px solid #E2E8F0;
+}
+
+/* Cards de métricas */
+[data-theme="light"] .stMetric {
+  background-color: #FFFFFF;
+  border-radius: 12px;
+  padding: 1.5rem;
+  border-left: 4px solid var(--accent-color, #10B981);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+[data-theme="light"] .stMetric:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* Textos */
+[data-theme="light"] h1, [data-theme="light"] h2, [data-theme="light"] h3 {
+  color: #0F172A !important;
+  font-weight: 600;
+}
+
+[data-theme="light"] p, [data-theme="light"] span {
+  color: #475569;
+}
+
+/* Inputs */
+[data-theme="light"] .stTextInput input,
+[data-theme="light"] .stSelectbox div[data-baseweb="select"],
+[data-theme="light"] .stMultiselect div[data-baseweb="select"] {
+  background-color: #FFFFFF;
+  color: #0F172A;
+  border-color: #E2E8F0;
+}
+
+/* Botões */
+[data-theme="light"] .stButton button {
+  background-color: #10B981;
+  color: white;
+  border-radius: 8px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+[data-theme="light"] .stButton button:hover {
+  background-color: #059669;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
