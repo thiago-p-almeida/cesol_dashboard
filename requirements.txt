@@ -1,0 +1,29 @@
+# CESOL Pro - Requirements atualizados para Python 3.14
+
+# Core
+streamlit>=1.40.0
+plotly>=6.0.0
+pandas>=2.2.0
+numpy>=2.1.0
+
+# Database
+SQLAlchemy>=2.0.0
+psycopg2-binary>=2.9.9
+alembic>=1.13.0
+
+# UI/UX Components
+streamlit-option-menu>=0.4.0
+streamlit-extras>=0.6.0
+
+# Data Validation
+pandera>=0.20.0
+
+# Excel Export
+xlsxwriter>=3.2.0
+
+# Environment
+python-dotenv>=1.0.0
+
+# Utilities
+python-dateutil>=2.9.0
+pytz>=2026.1
