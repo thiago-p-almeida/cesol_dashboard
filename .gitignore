@@ -1,0 +1,8 @@
+.env
+.venv/
+__pycache__/
+backups/
+estrutura_projeto.txt
+ziwUalt5
+*.pyc
+.DS_Store
