@@ -1,25 +1,24 @@
 import streamlit as st
 from datetime import datetime
-from typing import Any
 import pandas as pd
-
 from components.charts import create_premium_area
 from components.typography import render_page_header, render_section_title
 
-
 def render_forecast_view(
-    financial_svc: Any,
-    export_svc: Any,
+    financial_svc,
+    export_svc,
     df_active: pd.DataFrame,
     months_to_forecast: int = 6,
-    delinquency_rate: float = 0.10,
+    delinquency_rate: float = 0.10
 ) -> None:
+    
+    # CORREÇÃO AQUI: Passando o 'forecast' como primeiro argumento
     render_page_header(
-        title="🔮 Projeção Financeira",
-        subtitle=f"Projeção de fluxo de caixa para os próximos {months_to_forecast} meses",
+        "forecast",
+        "Projeções Financeiras",
+        f"Projeção de fluxo de caixa para os próximos {months_to_forecast} meses"
     )
 
-    # Note: Usando os novos serviços desmembrados (Fase 2)
     df_forecast = financial_svc.get_financial_forecasting(
         df_active=df_active,
         months=months_to_forecast,
@@ -30,17 +29,17 @@ def render_forecast_view(
         st.warning("Sem dados para projeção.")
         return
 
-    render_section_title("📈 Projeção de Receita vs Risco")
-
+    render_section_title("Projeção de Receita vs Risco")
     fig_forecast = create_premium_area(
         data=df_forecast,
         x_col='Mês',
         y_cols=['Receita Projetada (Líquida)', 'Risco de Inadimplência'],
+        fill_gradient=True
     )
     st.plotly_chart(fig_forecast, use_container_width=True, config={'displayModeBar': False})
 
-    st.write("")
-    render_section_title("📋 Planilha de Projeção")
+    st.markdown("<br>", unsafe_allow_html=True)
+    render_section_title("Planilha de Projeção")
 
     st.dataframe(
         df_forecast.style.format({
@@ -53,9 +52,8 @@ def render_forecast_view(
 
     col_btn, _ = st.columns([1, 3])
     with col_btn:
-        # Note: ExportService independente cuidando do Excel
         if st.download_button(
-            label="📥 Baixar Projeção em Excel",
+            label="Baixar Projeção em Excel",
             data=export_svc.to_excel(df_forecast, sheet_name='Projecao'),
             file_name=f"projecao_{datetime.now().strftime('%Y%m%d')}.xlsx",
             mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
