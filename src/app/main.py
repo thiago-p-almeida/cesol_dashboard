@@ -1,6 +1,3 @@
-# main.py refatorado - Arquitetura Nativa Streamlit (v2.3)
-# Entry point otimizado sem dependências manuais de CSS/Theme
-
 import os
 import sys
 from datetime import datetime
@@ -8,7 +5,7 @@ import streamlit as st
 import pandas as pd
 
 # =============================================================================
-# CONFIGURAÇÃO INICIAL
+# CONFIGURAÇÃO INICIAL E INJEÇÃO DE CSS PREMIUM
 # =============================================================================
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../..")))
@@ -20,6 +17,21 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
+# Injeção de CSS Premium (Apenas o essencial para reset de layout)
+st.markdown("""
+<style>
+    /* Reset agressivo para evitar vazamento de estilo de código */
+    code { display: none !important; }
+    .stMarkdown pre { background-color: transparent !important; border: none !important; padding: 0 !important; }
+    .stMarkdown div { line-height: normal !important; }
+    
+    /* Layout de Grade Responsivo */
+    [data-testid="stHorizontalBlock"] { gap: 1rem !important; }
+    @media (max-width: 1200px) { [data-testid="column"] { min-width: calc(50% - 1rem) !important; flex: 1 1 50% !important; } }
+    @media (max-width: 768px) { [data-testid="column"] { min-width: 100% !important; } }
+</style>
+""", unsafe_allow_html=True)
+
 # =============================================================================
 # IMPORTS E LAZY LOADING
 # =============================================================================
@@ -29,7 +41,6 @@ from components.alerts import show_alert_container
 
 @st.cache_resource
 def get_services():
-    """Cache de serviços segmentados."""
     from src.services.academic import AcademicService
     from src.services.financial import FinancialService
     from src.services.exports import ExportService
@@ -38,7 +49,6 @@ def get_services():
 
 @st.cache_resource
 def get_views():
-    """Cache de views."""
     from views.overview import render_overview_view
     from views.financial import render_financial_view
     from views.retention import render_retention_view
@@ -52,10 +62,10 @@ def get_views():
         "admin": render_admin_view,
     }
 
-# =============================================================================
-# SERVIÇOS E DADOS
-# =============================================================================
+# ... (Restante do código permanece igual até a renderização) ...
+# [Mantenha a lógica de carregamento de dados e filtros que já funciona]
 
+# [O trecho abaixo de renderização deve ser mantido exatamente como está no seu arquivo atual]
 academic_svc, financial_svc, export_svc, ingestor = get_services()
 
 @st.cache_data(ttl=300)
@@ -67,60 +77,36 @@ def load_dashboard_data():
 
 df_all_active, churn_data, expenses_summary = load_dashboard_data()
 
-# =============================================================================
-# NAVEGAÇÃO E FILTROS
-# =============================================================================
-
 selected_page = render_sidebar_navigation()
 
 from src.schemas.student_schema import ACADEMIC_TAXONOMY
 
 if df_all_active is not None and not df_all_active.empty:
-    rename_map = {
-        "Educação Infantil": "Ed. Infantil", "Infantil": "Ed. Infantil",
-        "Ensino Fundamental I": "Fundamental I", "Ensino Fundamental": "Fundamental I",
-        "Fundamental": "Fundamental I", "Ensino Fundamental II": "Fundamental II",
-    }
+    rename_map = {"Educação Infantil": "Ed. Infantil", "Infantil": "Ed. Infantil", "Ensino Fundamental I": "Fundamental I", "Ensino Fundamental": "Fundamental I", "Fundamental": "Fundamental I", "Ensino Fundamental II": "Fundamental II"}
     df_all_active["segment"] = df_all_active["segment"].replace(rename_map)
     all_segments = list(ACADEMIC_TAXONOMY.keys())
-
     with st.sidebar:
-        st.markdown("---")
-        st.header("🔍 Filtros")
+        st.markdown("---"); st.header("🔍 Filtros")
         selected_segments = st.multiselect("Segmento:", options=all_segments, default=all_segments)
         allowed_grades = [grade for segment in selected_segments for grade in ACADEMIC_TAXONOMY.get(segment, [])]
         df_filtered_step1 = df_all_active[df_all_active["segment"].isin(selected_segments)]
         available_grades = sorted([grade for grade in df_filtered_step1["grade"].unique() if grade in allowed_grades])
         selected_grades = st.multiselect("Série:", options=available_grades, default=available_grades)
         df_final = df_filtered_step1[df_filtered_step1["grade"].isin(selected_grades)]
-        st.markdown("---")
-        st.header("🔮 Projeção")
+        st.markdown("---"); st.header("🔮 Projeção")
         delinquency = st.slider("Inadimplência Estimada (%)", 0, 50, 10) / 100
         months_to_forecast = st.number_input("Meses de Projeção", 1, 24, 6)
 else:
     df_final, delinquency, months_to_forecast = df_all_active, 0.10, 6
 
-# =============================================================================
-# ALERTAS GLOBAIS
-# =============================================================================
-
 alertas_ativos = []
 total_receita = df_all_active["net_tuition"].sum() if df_all_active is not None and not df_all_active.empty else 0
 total_despesas = expenses_summary.get("total_despesas", 0)
 resultado_global = total_receita - total_despesas
-
 if total_receita > 0:
-    if (resultado_global / total_receita) < 0:
-        alertas_ativos.append({"tipo": "error", "msg": f"Déficit operacional de R$ {abs(resultado_global):,.2f}"})
-if churn_data.get("churn_rate", 0) > 10:
-    alertas_ativos.append({"tipo": "error", "msg": f"Churn elevado: {churn_data['churn_rate']:.1f}%"})
-
-if alertas_ativos:
-    show_alert_container(alertas_ativos)
-
-# =============================================================================
-# RENDERIZAÇÃO
-# =============================================================================
+    if (resultado_global / total_receita) < 0: alertas_ativos.append({"tipo": "error", "msg": f"Déficit operacional de R$ {abs(resultado_global):,.2f}"})
+if churn_data.get("churn_rate", 0) > 10: alertas_ativos.append({"tipo": "error", "msg": f"Churn elevado: {churn_data['churn_rate']:.1f}%"})
+if alertas_ativos: show_alert_container(alertas_ativos)
 
 views = get_views()
 view_params = {
@@ -130,7 +116,6 @@ view_params = {
     "forecast": {"financial_svc": financial_svc, "export_svc": export_svc, "df_active": df_all_active, "months_to_forecast": months_to_forecast, "delinquency_rate": delinquency},
     "admin": {"ingestor": ingestor},
 }
-
 view_func = views.get(selected_page, views["overview"])
 view_func(**view_params.get(selected_page, {}))
 
