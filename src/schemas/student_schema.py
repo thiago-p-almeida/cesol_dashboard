@@ -17,15 +17,15 @@ VALID_SEGMENTS = list(ACADEMIC_TAXONOMY.keys())
 VALID_GRADES = [grade for grades in ACADEMIC_TAXONOMY.values() for grade in grades]
 
 # ==========================================
-# 2. MAPEAMENTO DE COLUNAS (CSV -> DB)
+# 2. MAPEAMENTO DE COLUNAS (CSV PT-BR -> Banco de Dados EN)
 # ==========================================
 COLUMN_MAP = {
-    "name": "name",
-    "segment": "segment",
-    "grade": "grade",
-    "full_tuition": "full_tuition",
-    "discount_value": "discount_value",
-    "scholarship_value": "scholarship_value"
+    "nome": "name",
+    "segmento": "segment",
+    "serie": "grade",
+    "mensalidade": "full_tuition",
+    "desconto": "discount_value",
+    "bolsa": "scholarship_value"
 }
 
 # ==========================================

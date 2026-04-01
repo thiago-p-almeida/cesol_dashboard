@@ -38,20 +38,22 @@ class DataIngestionService:
         return df
 
     def process_students_csv(self, file_content, file_name):
-        # Processa, normaliza e valida a entrada de novos alunos.
-        # Carrega apenas as colunas necessárias mapeadas no schema
+        from src.schemas.student_schema import StudentSchema, COLUMN_MAP
+        
+        # 1. Lê o CSV esperando as colunas em Português-BR
         df = pd.read_csv(file_content, usecols=COLUMN_MAP.keys())
         
-        # Etapa 1: Normalização (Transformação)
-        # Transforma "Ensino Fundamental" em "Fundamental I" etc.
+        # 2. TRADUÇÃO MÁGICA: Renomeia de PT-BR para EN
+        # Ex: "mensalidade" vira "full_tuition" silenciosamente
+        df = df.rename(columns=COLUMN_MAP)
+        
+        # 3. Normalização (Transforma "Ensino Fundamental" em "Fundamental I")
         df = self._normalization_layer(df)
         
-        # Etapa 2: Validação Estrita (Pandera)
-        # O StudentSchema (Phase 1) garante que o dado agora está limpo
+        # 4. Validação Estrita (Pandera valida as colunas já em Inglês)
         validated_df = StudentSchema.validate(df)
         
-        # Etapa 3: Carga (Load) para o PostgreSQL
-        # append: adiciona novos alunos sem apagar os existentes
+        # 5. Carga no PostgreSQL
         validated_df.to_sql('students', self.engine, if_exists='append', index=False)
         
         return f"Sucesso! {len(validated_df)} registros importados e normalizados."
