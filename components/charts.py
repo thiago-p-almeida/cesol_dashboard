@@ -3,6 +3,7 @@ import plotly.graph_objects as go
 import pandas as pd
 from typing import List, Optional
 
+# Paleta Set2 é nativa, segura e visualmente profissional
 DEFAULT_PALETTE = px.colors.qualitative.Set2
 
 def create_premium_pie(
@@ -14,8 +15,8 @@ def create_premium_pie(
     color_discrete_sequence: Optional[List[str]] = None,
     animation: bool = True
 ) -> go.Figure:
-    # Mantém assinatura por compatibilidade, mas usa template nativo.
     palette = color_discrete_sequence or DEFAULT_PALETTE
+    
     fig = px.pie(
         data,
         values=values_col,
@@ -60,7 +61,6 @@ def create_premium_bar(
     color_discrete_sequence: bool = False,
     animation: bool = True
 ) -> go.Figure:
-    # Mantém assinatura por compatibilidade, mas usa componentes nativos.
     if color_col:
         fig = px.bar(
             data, x=x_col, y=y_col, color=color_col,
@@ -112,33 +112,21 @@ def create_premium_area(
     theme: Optional[str] = None,
     fill_gradient: bool = True
 ) -> go.Figure:
-    # Mantém assinatura por compatibilidade, sem dependência de tema customizado.
     fig = go.Figure()
 
     for i, y_col in enumerate(y_cols):
+        # A paleta Set2 já fornece cores seguras, evitamos conversão manual aqui
         color = DEFAULT_PALETTE[i % len(DEFAULT_PALETTE)]
-        hex_color = color.lstrip('#')
-        r, g, b = tuple(int(hex_color[i:i+2], 16) for i in (0, 2, 4))
-        rgba_fill = f"rgba({r}, {g}, {b}, 0.2)"
 
-        if fill_gradient and i == 0:
-            fig.add_trace(go.Scatter(
-                x=data[x_col],
-                y=data[y_col],
-                name=y_col,
-                fill="tozeroy",
-                fillcolor=rgba_fill,
-                line=dict(color=color, width=3),
-                mode="lines",
-            ))
-        else:
-            fig.add_trace(go.Scatter(
-                x=data[x_col],
-                y=data[y_col],
-                name=y_col,
-                line=dict(color=color, width=2),
-                mode="lines",
-            ))
+        fig.add_trace(go.Scatter(
+            x=data[x_col],
+            y=data[y_col],
+            name=y_col,
+            # Plotly entende a cor diretamente, sem precisar converter p/ RGBA manualmente
+            line=dict(color=color, width=3),
+            fill='tozeroy' if (fill_gradient and i == 0) else None,
+            mode="lines",
+        ))
 
     fig.update_layout(
         xaxis=dict(showgrid=False),
