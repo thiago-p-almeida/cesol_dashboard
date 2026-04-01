@@ -1,3 +1,6 @@
+# main.py refatorado - Arquitetura Nativa Streamlit (v2.5)
+# Entry point otimizado com Grid Responsivo, Atomic DOM e Translation Layer
+
 import os
 import sys
 from datetime import datetime
@@ -5,7 +8,7 @@ import streamlit as st
 import pandas as pd
 
 # =============================================================================
-# CONFIGURAÇÃO INICIAL E INJEÇÃO DE CSS PREMIUM
+# CONFIGURAÇÃO INICIAL
 # =============================================================================
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../..")))
@@ -17,18 +20,49 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# Injeção de CSS Premium (Apenas o essencial para reset de layout)
+# =============================================================================
+# INJEÇÃO DE ESTILOS GLOBAIS E TRADUÇÃO (Design System Core)
+# =============================================================================
+
 st.markdown("""
 <style>
-    /* Reset agressivo para evitar vazamento de estilo de código */
+    /* ---------------------------------------------------
+       1. GRID INTELIGENTE E RESPONSIVIDADE
+       --------------------------------------------------- */
+    [data-testid="stHorizontalBlock"] {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1rem !important;
+    }
+    
+    @media (min-width: 768px) and (max-width: 1200px) {
+        [data-testid="column"] {
+            flex: 1 1 calc(50% - 1rem) !important;
+            min-width: calc(50% - 1rem) !important;
+        }
+    }
+    
+    @media (max-width: 767px) {
+        [data-testid="column"] {
+            flex: 1 1 100% !important;
+            min-width: 100% !important;
+            padding: 5px 0 !important;
+        }
+    }
+
+    /* ---------------------------------------------------
+       2. RESET DE COMPONENTES E ATOMIC DOM
+       --------------------------------------------------- */
     code { display: none !important; }
     .stMarkdown pre { background-color: transparent !important; border: none !important; padding: 0 !important; }
     .stMarkdown div { line-height: normal !important; }
     
-    /* Layout de Grade Responsivo */
-    [data-testid="stHorizontalBlock"] { gap: 1rem !important; }
-    @media (max-width: 1200px) { [data-testid="column"] { min-width: calc(50% - 1rem) !important; flex: 1 1 50% !important; } }
-    @media (max-width: 768px) { [data-testid="column"] { min-width: 100% !important; } }
+    [data-testid="stExpander"] {
+        border: 1px solid rgba(255, 255, 255, 0.1) !important;
+        background-color: #1E293B !important;
+        border-radius: 12px !important;
+    }
+
 </style>
 """, unsafe_allow_html=True)
 
@@ -62,10 +96,10 @@ def get_views():
         "admin": render_admin_view,
     }
 
-# ... (Restante do código permanece igual até a renderização) ...
-# [Mantenha a lógica de carregamento de dados e filtros que já funciona]
+# =============================================================================
+# SERVIÇOS E DADOS
+# =============================================================================
 
-# [O trecho abaixo de renderização deve ser mantido exatamente como está no seu arquivo atual]
 academic_svc, financial_svc, export_svc, ingestor = get_services()
 
 @st.cache_data(ttl=300)
@@ -77,36 +111,90 @@ def load_dashboard_data():
 
 df_all_active, churn_data, expenses_summary = load_dashboard_data()
 
+# =============================================================================
+# NAVEGAÇÃO E FILTROS (Refatorado com UX Premium - st.pills)
+# =============================================================================
+
 selected_page = render_sidebar_navigation()
 
 from src.schemas.student_schema import ACADEMIC_TAXONOMY
 
 if df_all_active is not None and not df_all_active.empty:
-    rename_map = {"Educação Infantil": "Ed. Infantil", "Infantil": "Ed. Infantil", "Ensino Fundamental I": "Fundamental I", "Ensino Fundamental": "Fundamental I", "Fundamental": "Fundamental I", "Ensino Fundamental II": "Fundamental II"}
+    rename_map = {
+        "Educação Infantil": "Ed. Infantil", "Infantil": "Ed. Infantil",
+        "Ensino Fundamental I": "Fundamental I", "Ensino Fundamental": "Fundamental I",
+        "Fundamental": "Fundamental I", "Ensino Fundamental II": "Fundamental II",
+    }
     df_all_active["segment"] = df_all_active["segment"].replace(rename_map)
     all_segments = list(ACADEMIC_TAXONOMY.keys())
+
     with st.sidebar:
-        st.markdown("---"); st.header("🔍 Filtros")
-        selected_segments = st.multiselect("Segmento:", options=all_segments, default=all_segments)
-        allowed_grades = [grade for segment in selected_segments for grade in ACADEMIC_TAXONOMY.get(segment, [])]
-        df_filtered_step1 = df_all_active[df_all_active["segment"].isin(selected_segments)]
+        st.markdown("---")
+        st.header("🔍 Filtros")
+        
+        # 1. Filtro de Segmento usando Pills (Substitui o Multiselect)
+        # Experiência tátil, sem dropdown, sem textos em inglês.
+        selected_segments = st.pills(
+            "Segmento:", 
+            options=all_segments, 
+            default=all_segments,
+            selection_mode="multi"
+        )
+        
+        # Lógica de encadeamento
+        # Se selected_segments for None (quando o usuário desmarca tudo no pills), tratamos como lista vazia
+        seg_list = selected_segments if selected_segments is not None else []
+        
+        allowed_grades =[grade for segment in seg_list for grade in ACADEMIC_TAXONOMY.get(segment, [])]
+        df_filtered_step1 = df_all_active[df_all_active["segment"].isin(seg_list)]
         available_grades = sorted([grade for grade in df_filtered_step1["grade"].unique() if grade in allowed_grades])
-        selected_grades = st.multiselect("Série:", options=available_grades, default=available_grades)
-        df_final = df_filtered_step1[df_filtered_step1["grade"].isin(selected_grades)]
-        st.markdown("---"); st.header("🔮 Projeção")
+        
+        # 2. UX Inteligente: Feedback visual se não houver segmento
+        sem_segmento = len(seg_list) == 0
+        
+        if sem_segmento:
+            st.info("👆 Selecione um segmento acima para ver as séries.")
+            df_final = df_filtered_step1 # Retorna vazio com segurança
+        else:
+            # Filtro de Série usando Pills
+            selected_grades = st.pills(
+                "Série:", 
+                options=available_grades, 
+                default=available_grades,
+                selection_mode="multi"
+            )
+            
+            grade_list = selected_grades if selected_grades is not None else []
+            df_final = df_filtered_step1[df_filtered_step1["grade"].isin(grade_list)]
+        
+        st.markdown("---")
+        st.header("🔮 Projeção")
         delinquency = st.slider("Inadimplência Estimada (%)", 0, 50, 10) / 100
         months_to_forecast = st.number_input("Meses de Projeção", 1, 24, 6)
 else:
     df_final, delinquency, months_to_forecast = df_all_active, 0.10, 6
 
+# =============================================================================
+# ALERTAS GLOBAIS
+# =============================================================================
+
 alertas_ativos = []
 total_receita = df_all_active["net_tuition"].sum() if df_all_active is not None and not df_all_active.empty else 0
 total_despesas = expenses_summary.get("total_despesas", 0)
 resultado_global = total_receita - total_despesas
+
 if total_receita > 0:
-    if (resultado_global / total_receita) < 0: alertas_ativos.append({"tipo": "error", "msg": f"Déficit operacional de R$ {abs(resultado_global):,.2f}"})
-if churn_data.get("churn_rate", 0) > 10: alertas_ativos.append({"tipo": "error", "msg": f"Churn elevado: {churn_data['churn_rate']:.1f}%"})
-if alertas_ativos: show_alert_container(alertas_ativos)
+    if (resultado_global / total_receita) < 0:
+        alertas_ativos.append({"tipo": "error", "msg": f"Déficit operacional de R$ {abs(resultado_global):,.2f}"})
+if churn_data.get("churn_rate", 0) > 10:
+    alertas_ativos.append({"tipo": "error", "msg": f"Churn elevado: {churn_data['churn_rate']:.1f}%"})
+
+if alertas_ativos:
+    show_alert_container(alertas_ativos)
+
+# =============================================================================
+# RENDERIZAÇÃO
+# =============================================================================
 
 views = get_views()
 view_params = {
@@ -116,8 +204,9 @@ view_params = {
     "forecast": {"financial_svc": financial_svc, "export_svc": export_svc, "df_active": df_all_active, "months_to_forecast": months_to_forecast, "delinquency_rate": delinquency},
     "admin": {"ingestor": ingestor},
 }
+
 view_func = views.get(selected_page, views["overview"])
 view_func(**view_params.get(selected_page, {}))
 
 st.markdown("---")
-st.caption(f"© {datetime.now().year} CESOL Pro - v2.3")
+st.caption(f"© {datetime.now().year} CESOL Pro - v2.5 Premium")
