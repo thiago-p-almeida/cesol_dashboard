@@ -38,6 +38,6 @@ def render_sidebar_navigation(
         selected_id = page_ids[labels.index(selected_label)]
         
         st.markdown("<hr style='margin:20px 0; border-color:rgba(255,255,255,0.1);'>", unsafe_allow_html=True)
-        st.caption("v2.4 Premium")
+        st.caption("v2.5 Premium")
         
         return selected_id
