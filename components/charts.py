@@ -3,148 +3,140 @@ import plotly.graph_objects as go
 import pandas as pd
 from typing import List, Optional
 
-# Paleta Set2 é nativa, segura e visualmente profissional
-DEFAULT_PALETTE = px.colors.qualitative.Set2
+# =============================================================================
+# CONFIGURAÇÕES DE DESIGN SYSTEM (Single Source of Truth para Gráficos)
+# =============================================================================
+CHART_FONT = "Inter, sans-serif"
+SECONDARY_TEXT_COLOR = "#94A3B8"
+# Paleta Set2: Cores pastéis que garantem contraste e elegância no Dark Mode
+COLOR_PALETTE = px.colors.qualitative.Set2
 
-def create_premium_pie(
-    data: pd.DataFrame,
-    values_col: str,
-    names_col: str,
-    hole: float = 0.4,
-    theme: Optional[str] = None,
-    color_discrete_sequence: Optional[List[str]] = None,
-    animation: bool = True
-) -> go.Figure:
-    palette = color_discrete_sequence or DEFAULT_PALETTE
-    
+def _apply_premium_layout(fig: go.Figure, show_legend: bool = True, margin_b: int = 60):
+    """
+    Motor central de layout. Garante espaçamentos, tipografia fluida e previne bugs do Plotly.
+    """
+    fig.update_layout(
+        # CORREÇÃO 1 (Undefined): Passar string vazia em vez de None evita o bug no React
+        title=dict(text=""),
+        
+        # MARGENS: O 'b' (bottom) dinâmico garante que o gráfico não esmague a legenda
+        margin=dict(t=10, b=margin_b, l=10, r=10),
+        
+        # TIPOGRAFIA E FUNDO: Fundo transparente para herdar a cor do dashboard
+        font=dict(family=CHART_FONT, size=14, color=SECONDARY_TEXT_COLOR),
+        paper_bgcolor="rgba(0,0,0,0)",
+        plot_bgcolor="rgba(0,0,0,0)",
+        
+        # LEGENDA INTELIGENTE: Ancorada no centro inferior, com espaço para respirar
+        showlegend=show_legend,
+        legend=dict(
+            orientation="h",
+            yanchor="top",
+            y=-0.15, # Distância segura do eixo X
+            xanchor="center",
+            x=0.5,
+            font=dict(size=14) # Tamanho legível em tablets/mobile
+        ),
+        
+        # TOOLTIP PREMIUM: Deixa a caixa de hover escura e elegante
+        hoverlabel=dict(
+            bgcolor="#1E293B",
+            font_size=14,
+            font_family=CHART_FONT,
+            bordercolor="rgba(255,255,255,0.1)"
+        )
+    )
+    return fig
+
+def create_premium_pie(data: pd.DataFrame, values_col: str, names_col: str, hole: float = 0.4) -> go.Figure:
+    """
+    Renderiza Gráfico de Pizza/Donut otimizado para Mobile (Inside Labels).
+    """
     fig = px.pie(
         data,
         values=values_col,
         names=names_col,
         hole=hole,
-        color_discrete_sequence=palette,
-        template="plotly",
+        color_discrete_sequence=COLOR_PALETTE
     )
-
-    if animation:
-        fig.update_traces(
-            rotation=90,
-            pull=[0.02 if i == 0 else 0 for i in range(len(data))],
-            marker=dict(line=dict(width=1)),
-        )
-
-    fig.update_layout(
-        showlegend=True,
-        legend=dict(
-            orientation="h",
-            yanchor="bottom",
-            y=-0.1,
-            xanchor="center",
-            x=0.5,
-            font=dict(size=12),
-        ),
-        margin=dict(t=30, b=60, l=20, r=20),
-        paper_bgcolor="rgba(0,0,0,0)",
-        plot_bgcolor="rgba(0,0,0,0)",
+    
+    # CORREÇÃO 2 (Corte no Mobile): Textos para DENTRO da fatia, exibindo apenas porcentagem.
+    # O nome da categoria fica na legenda e no hover (tooltip).
+    fig.update_traces(
+        textposition='inside',
+        textinfo='percent',
+        marker=dict(line=dict(color='#0F172A', width=2)),
+        # Tooltip customizado para mostrar todos os detalhes ao tocar/passar o mouse
+        hovertemplate="<b>%{label}</b><br>Valor: %{value}<br>Participação: %{percent}<extra></extra>"
     )
+    
+    # Margem inferior estendida (80) para caber legendas longas divididas em linhas
+    return _apply_premium_layout(fig, margin_b=80)
 
-    return fig
-
-
-def create_premium_bar(
-    data: pd.DataFrame,
-    x_col: str,
-    y_col: str,
-    color_col: Optional[str] = None,
-    orientation: str = "v",
-    theme: Optional[str] = None,
-    color_discrete_sequence: bool = False,
-    animation: bool = True
-) -> go.Figure:
-    if color_col:
-        fig = px.bar(
-            data, x=x_col, y=y_col, color=color_col,
-            color_discrete_sequence=DEFAULT_PALETTE if color_discrete_sequence else None,
-            template="plotly",
-        )
-    else:
-        fig = px.bar(
-            data, x=x_col, y=y_col,
-            color_discrete_sequence=[DEFAULT_PALETTE[0]],
-            template="plotly",
-        )
-
-    if animation:
-        fig.update_traces(
-            marker=dict(line=dict(width=1)),
-            texttemplate="R$ %{y:,.0f}",
-            textposition="outside",
-            cliponaxis=False,
-            hovertemplate="<b>%{x}</b><br>R$ %{y:,.2f}<extra></extra>",
-        )
-    else:
-        fig.update_traces(marker_line_width=1)
-
-    fig.update_layout(
-        xaxis=dict(
-            showgrid=False,
-            title=dict(text=x_col.replace("_", " ").title(), font=dict(size=12)),
-        ),
-        yaxis=dict(
-            showgrid=True,
-            title=dict(text='Valor (R$)', font=dict(size=12)),
-            tickformat="R$ ,.0f",
-        ),
-        margin=dict(t=40, b=40, l=60, r=20),
-        paper_bgcolor="rgba(0,0,0,0)",
-        plot_bgcolor="rgba(0,0,0,0)",
-        showlegend=False,
-        hovermode="x unified",
+def create_premium_bar(data: pd.DataFrame, x_col: str, y_col: str) -> go.Figure:
+    """
+    Renderiza Gráfico de Barras com eixos limpos e rótulos externos.
+    """
+    fig = px.bar(
+        data, 
+        x=x_col, 
+        y=y_col,
+        color_discrete_sequence=[COLOR_PALETTE[0]] # Usa a primeira cor da paleta
     )
+    
+    fig.update_traces(
+        texttemplate="R$ %{y:,.0f}",
+        textposition="outside",
+        cliponaxis=False, # Permite que o texto de barras altas passe do limite do eixo
+        hovertemplate="<b>%{x}</b><br>Receita: R$ %{y:,.2f}<extra></extra>"
+    )
+    
+    # CORREÇÃO 3 (net_tuition e grade): title_text="" limpa os nomes técnicos da tela
+    fig.update_yaxes(
+        title_text="", 
+        showgrid=True, 
+        gridcolor="rgba(255,255,255,0.05)", 
+        tickformat="R$ ,.0f"
+    )
+    fig.update_xaxes(
+        title_text="", 
+        showgrid=False
+    )
+    
+    # Gráfico de barras geralmente não precisa de legenda (os rótulos do eixo X bastam)
+    return _apply_premium_layout(fig, show_legend=False)
 
-    return fig
-
-
-def create_premium_area(
-    data: pd.DataFrame,
-    x_col: str,
-    y_cols: List[str],
-    theme: Optional[str] = None,
-    fill_gradient: bool = True
-) -> go.Figure:
+def create_premium_area(data: pd.DataFrame, x_col: str, y_cols: List[str]) -> go.Figure:
+    """
+    Renderiza Gráfico de Área (Projeções) com eixo X dinâmico (Auto-Rotate).
+    """
     fig = go.Figure()
-
+    
+    # Renderiza múltiplas linhas (ex: Receita vs Risco)
     for i, y_col in enumerate(y_cols):
-        # A paleta Set2 já fornece cores seguras, evitamos conversão manual aqui
-        color = DEFAULT_PALETTE[i % len(DEFAULT_PALETTE)]
-
+        color = COLOR_PALETTE[i % len(COLOR_PALETTE)]
         fig.add_trace(go.Scatter(
             x=data[x_col],
             y=data[y_col],
             name=y_col,
-            # Plotly entende a cor diretamente, sem precisar converter p/ RGBA manualmente
+            fill='tozeroy' if i == 0 else None, # Preenche apenas a linha de base
             line=dict(color=color, width=3),
-            fill='tozeroy' if (fill_gradient and i == 0) else None,
-            mode="lines",
+            mode="lines"
         ))
-
-    fig.update_layout(
-        xaxis=dict(showgrid=False),
-        yaxis=dict(
-            showgrid=True,
-            tickformat="R$ ,.0f",
-        ),
-        margin=dict(t=30, b=40, l=60, r=20),
-        paper_bgcolor="rgba(0,0,0,0)",
-        plot_bgcolor="rgba(0,0,0,0)",
-        legend=dict(
-            orientation="h",
-            yanchor="bottom",
-            y=-0.2,
-            xanchor="center",
-            x=0.5
-        ),
-        hovermode="x unified",
+    
+    # CORREÇÃO 4 (Datas abarrotadas): Removido o 'tickangle=0'. 
+    # O Plotly agora vai inclinar as datas sozinho no mobile se o espaço apertar.
+    fig.update_xaxes(
+        title_text="", 
+        showgrid=False
     )
-
-    return fig
+    
+    fig.update_yaxes(
+        title_text="",
+        showgrid=True, 
+        gridcolor="rgba(255,255,255,0.05)", 
+        tickformat="R$ ,.0f"
+    )
+    
+    # Margem inferior generosa (100) para evitar que as datas longas toquem na legenda
+    return _apply_premium_layout(fig, margin_b=100)
