@@ -14,6 +14,12 @@ PAGES_CONFIG = {
         # Lucide Icon: wallet
         "header_svg": '''<svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 7V4a1 1 0 0 0-1-1H5a2 2 0 0 0 0 4h15a1 1 0 0 1 1 1v4h-3a2 2 0 0 0 0 4h3a8 8 0 0 1-9.24 2.76"/><path d="M3 15a2 2 0 0 0 2 2h15a1 1 0 0 0 1-1v-4a1 1 0 0 0-1-1H5l-2.29-3.26A2 2 0 0 0 1.5 9V15z"/></svg>'''
     },
+    "academic": {
+        "label": "Acadêmico & Operacional",
+        "sidebar_icon": "mortarboard",
+        # Lucide Icon: graduation-cap
+        "header_svg": '''<svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.42 10.922a2 2 0 0 1-.019 3.837l-8.5 4.36a2 2 0 0 1-1.802 0l-8.5-4.36a2 2 0 0 1-.019-3.837l8.5-4.473a2 2 0 0 1 1.84 0l8.5 4.473z"/><path d="M14 14.5v4a2 2 0 0 1-2 2v0a2 2 0 0 1-2-2v-4"/><path d="M22 10v6"/></svg>'''
+    },
     "retention": {
         "label": "Retenção",
         "sidebar_icon": "people",
