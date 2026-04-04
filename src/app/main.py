@@ -1,5 +1,5 @@
-# main.py refatorado - Arquitetura Nativa Streamlit (v2.5)
-# Entry point otimizado com Grid Responsivo, Atomic DOM e Translation Layer
+# main.py refatorado - Arquitetura Nativa Streamlit (v2.6)
+# Entry point otimizado com Grid Responsivo, Atomic DOM e Roteamento Acadêmico
 
 import os
 import sys
@@ -21,14 +21,12 @@ st.set_page_config(
 )
 
 # =============================================================================
-# INJEÇÃO DE ESTILOS GLOBAIS E TRADUÇÃO (Design System Core)
+# INJEÇÃO DE ESTILOS GLOBAIS (Design System Core)
 # =============================================================================
 
 st.markdown("""
 <style>
-    /* ---------------------------------------------------
-       1. GRID INTELIGENTE E RESPONSIVIDADE
-       --------------------------------------------------- */
+    /* 1. GRID INTELIGENTE E RESPONSIVIDADE */
     [data-testid="stHorizontalBlock"] {
         display: flex;
         flex-wrap: wrap;
@@ -50,9 +48,7 @@ st.markdown("""
         }
     }
 
-    /* ---------------------------------------------------
-       2. RESET DE COMPONENTES E ATOMIC DOM
-       --------------------------------------------------- */
+    /* 2. RESET DE COMPONENTES E ATOMIC DOM */
     code { display: none !important; }
     .stMarkdown pre { background-color: transparent !important; border: none !important; padding: 0 !important; }
     .stMarkdown div { line-height: normal !important; }
@@ -62,7 +58,6 @@ st.markdown("""
         background-color: #1E293B !important;
         border-radius: 12px !important;
     }
-
 </style>
 """, unsafe_allow_html=True)
 
@@ -83,14 +78,18 @@ def get_services():
 
 @st.cache_resource
 def get_views():
+    """Lazy loading das views para otimização de memória."""
     from views.overview import render_overview_view
     from views.financial import render_financial_view
+    from views.academic import render_academic_view # Nova View
     from views.retention import render_retention_view
     from views.forecast import render_forecast_view
     from views.admin import render_admin_view
+    
     return {
         "overview": render_overview_view,
         "financial": render_financial_view,
+        "academic": render_academic_view, # Registro da rota
         "retention": render_retention_view,
         "forecast": render_forecast_view,
         "admin": render_admin_view,
@@ -104,15 +103,16 @@ academic_svc, financial_svc, export_svc, ingestor = get_services()
 
 @st.cache_data(ttl=300)
 def load_dashboard_data():
-    df = academic_svc.get_active_students_df()
+    df_active = academic_svc.get_active_students_df()
+    df_all = academic_svc.get_all_students_df()
     churn = academic_svc.get_churn_analysis()
     expenses = financial_svc.get_expenses_summary()
-    return df, churn, expenses
+    return df_active, df_all, churn, expenses
 
-df_all_active, churn_data, expenses_summary = load_dashboard_data()
+df_all_active, df_all, churn_data, expenses_summary = load_dashboard_data()
 
 # =============================================================================
-# NAVEGAÇÃO E FILTROS (Refatorado com UX Premium - st.pills)
+# NAVEGAÇÃO E FILTROS
 # =============================================================================
 
 selected_page = render_sidebar_navigation()
@@ -132,8 +132,6 @@ if df_all_active is not None and not df_all_active.empty:
         st.markdown("---")
         st.header("🔍 Filtros")
         
-        # 1. Filtro de Segmento usando Pills (Substitui o Multiselect)
-        # Experiência tátil, sem dropdown, sem textos em inglês.
         selected_segments = st.pills(
             "Segmento:", 
             options=all_segments, 
@@ -141,22 +139,18 @@ if df_all_active is not None and not df_all_active.empty:
             selection_mode="multi"
         )
         
-        # Lógica de encadeamento
-        # Se selected_segments for None (quando o usuário desmarca tudo no pills), tratamos como lista vazia
         seg_list = selected_segments if selected_segments is not None else []
         
-        allowed_grades =[grade for segment in seg_list for grade in ACADEMIC_TAXONOMY.get(segment, [])]
+        allowed_grades = [grade for segment in seg_list for grade in ACADEMIC_TAXONOMY.get(segment, [])]
         df_filtered_step1 = df_all_active[df_all_active["segment"].isin(seg_list)]
         available_grades = sorted([grade for grade in df_filtered_step1["grade"].unique() if grade in allowed_grades])
         
-        # 2. UX Inteligente: Feedback visual se não houver segmento
         sem_segmento = len(seg_list) == 0
         
         if sem_segmento:
             st.info("👆 Selecione um segmento acima para ver as séries.")
-            df_final = df_filtered_step1 # Retorna vazio com segurança
+            df_final = df_filtered_step1
         else:
-            # Filtro de Série usando Pills
             selected_grades = st.pills(
                 "Série:", 
                 options=available_grades, 
@@ -198,15 +192,40 @@ if alertas_ativos:
 
 views = get_views()
 view_params = {
-    "overview": {"df_all_active": df_all_active, "churn_data": churn_data, "expenses_summary": expenses_summary},
-    "financial": {"df_filtered": df_final, "expenses_summary": expenses_summary},
-    "retention": {"churn_data": churn_data},
-    "forecast": {"financial_svc": financial_svc, "export_svc": export_svc, "df_active": df_all_active, "months_to_forecast": months_to_forecast, "delinquency_rate": delinquency},
-    "admin": {"ingestor": ingestor},
+    "overview": {
+        "df_all_active": df_all_active, 
+        "churn_data": churn_data, 
+        "expenses_summary": expenses_summary
+    },
+    "financial": {
+        "financial_svc": financial_svc,
+        "df_filtered": df_final, 
+        "df_all": df_all,
+        "expenses_summary": expenses_summary
+    },
+    "academic": { # Injeção de dependências para a nova View
+        "academic_svc": academic_svc,
+        "df_active": df_all_active,
+        "df_all": df_all
+    },
+    "retention": {
+        "churn_data": churn_data
+    },
+    "forecast": {
+        "financial_svc": financial_svc, 
+        "export_svc": export_svc, 
+        "df_active": df_all_active, 
+        "months_to_forecast": months_to_forecast, 
+        "delinquency_rate": delinquency
+    },
+    "admin": {
+        "ingestor": ingestor
+    },
 }
 
+# Execução da View selecionada com desempacotamento de parâmetros
 view_func = views.get(selected_page, views["overview"])
 view_func(**view_params.get(selected_page, {}))
 
 st.markdown("---")
-st.caption(f"© {datetime.now().year} CESOL Pro - v2.5 Premium")
+st.caption(f"© {datetime.now().year} CESOL Pro - v2.6 Premium")
