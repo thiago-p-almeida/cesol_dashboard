@@ -21,6 +21,7 @@ VALID_GRADES = [grade for grades in ACADEMIC_TAXONOMY.values() for grade in grad
 # ==========================================
 COLUMN_MAP = {
     "nome": "name",
+    "data_nascimento": "birth_date",
     "segmento": "segment",
     "serie": "grade",
     "mensalidade": "full_tuition",
@@ -34,6 +35,8 @@ COLUMN_MAP = {
 StudentSchema = pa.DataFrameSchema(
     columns={
         "name": Column(str, Check.str_length(min_value=2), nullable=False),
+
+        "birth_date": Column(pa.DateTime, nullable=True),
         
         "segment": Column(
             str, 

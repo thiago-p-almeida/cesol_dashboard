@@ -2,7 +2,6 @@ import os
 import pandas as pd
 from sqlalchemy import create_engine
 from dotenv import load_dotenv
-from src.schemas.student_schema import StudentSchema, COLUMN_MAP
 
 # Carrega variáveis de ambiente
 load_dotenv()
@@ -16,10 +15,10 @@ class DataIngestionService:
         self.engine = create_engine(db_url)
 
     def _normalization_layer(self, df: pd.DataFrame) -> pd.DataFrame:
-        
-        # Camada de Limpeza (Data Quality): Converte variações de nomes 
-        # para a nova taxonomia enxuta aprovada (Phase 2).
-        
+        """
+        Camada de Limpeza (Data Quality): Converte variações de nomes 
+        para a nova taxonomia enxuta aprovada e formata datas.
+        """
         # Mapeamento de 'sujeira' para o padrão enxuto
         cleanup_map = {
             "Educação Infantil": "Ed. Infantil",
@@ -47,13 +46,23 @@ class DataIngestionService:
         # Ex: "mensalidade" vira "full_tuition" silenciosamente
         df = df.rename(columns=COLUMN_MAP)
         
-        # 3. Normalização (Transforma "Ensino Fundamental" em "Fundamental I")
+        # 3. PARSING DE DATAS (Resiliência para formato BR)
+        if 'birth_date' in df.columns:
+            # Converte string DD/MM/YYYY para datetime. 
+            # errors='coerce' transforma datas inválidas (ex: 31/02/2026) em NaT
+            df['birth_date'] = pd.to_datetime(df['birth_date'], format='%d/%m/%Y', errors='coerce')
+            
+            # Filtro de Qualidade: Remove linhas onde a data de nascimento ficou inválida (NaT)
+            # Isso impede que o banco de dados ou o Pandera quebrem
+            df = df.dropna(subset=['birth_date'])
+        
+        # 4. Normalização (Transforma "Ensino Fundamental" em "Fundamental I")
         df = self._normalization_layer(df)
         
-        # 4. Validação Estrita (Pandera valida as colunas já em Inglês)
+        # 5. Validação Estrita (Pandera valida as colunas já em Inglês e com datas corretas)
         validated_df = StudentSchema.validate(df)
         
-        # 5. Carga no PostgreSQL
+        # 6. Carga no PostgreSQL
         validated_df.to_sql('students', self.engine, if_exists='append', index=False)
         
         return f"Sucesso! {len(validated_df)} registros importados e normalizados."

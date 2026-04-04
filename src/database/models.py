@@ -10,6 +10,9 @@ class Student(Base):
     id = Column(Integer, primary_key=True)
     name = Column(String, nullable=False)
     
+    # Dados Demográficos
+    birth_date = Column(Date, nullable=True) # Suporta o cálculo do KPI de Distorção Idade-Série (TB-028)
+    
     # Taxonomia Acadêmica (TB-005)
     segment = Column(String)  # Infantil, Fundamental I, etc.
     grade = Column(String)    # 1º Ano, 2º Ano...
