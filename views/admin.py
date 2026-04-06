@@ -77,6 +77,6 @@ def render_admin_view(ingestor) -> None:
     # ==========================================
     col_info1, col_info2 = st.columns(2)
     with col_info1:
-        render_info_box("Versão e UI", "CESOL Pro v2.5 Premium\n\nUI Kit: Lucide Icons / Atomic DOM\n\nFramework: Streamlit 1.40+")
+        render_info_box("Versão e UI", "CESOL Pro v2.6 Premium\n\nUI Kit: Lucide Icons / Atomic DOM\n\nFramework: Streamlit 1.40+")
     with col_info2:
         render_info_box("Stack Técnico", "Backend: SQLAlchemy 2.0 + PostgreSQL\n\nFrontend: Streamlit + Plotly\n\nValidação e Tradução: Pandera")

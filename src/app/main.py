@@ -228,4 +228,4 @@ view_func = views.get(selected_page, views["overview"])
 view_func(**view_params.get(selected_page, {}))
 
 st.markdown("---")
-st.caption(f"© {datetime.now().year} CESOL Pro - v2.6 Premium")
+st.caption(f"© {datetime.now().year} CESOL Pro - v2.6 Premium | Thiago Almeida Developer.")
