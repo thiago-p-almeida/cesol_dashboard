@@ -12,7 +12,11 @@ class DataIngestionService:
         db_url = os.getenv("DATABASE_URL")
         if not db_url:
             raise ValueError("DATABASE_URL não encontrada no arquivo .env")
-        self.engine = create_engine(db_url)
+        self.engine = create_engine(
+            db_url,
+            pool_pre_ping=True,  # Checa se a conexão está viva antes de usar
+            pool_recycle=1800    # Recicla conexões a cada 30 minutos
+)
 
     def _normalization_layer(self, df: pd.DataFrame) -> pd.DataFrame:
         """

@@ -14,7 +14,11 @@ class AcademicService:
         db_url = os.getenv("DATABASE_URL")
         if not db_url:
             raise ValueError("DATABASE_URL não encontrada no .env")
-        self.engine = create_engine(db_url)
+        self.engine = create_engine(
+            db_url,
+            pool_pre_ping=True,  # Checa se a conexão está viva antes de usar
+            pool_recycle=1800    # Recicla conexões a cada 30 minutos
+)
 
         # 2. Leitura de Configuração de Capacidade (config/academic.json)
         self.config_path = Path(__file__).resolve().parent.parent.parent / "config" / "academic.json"
@@ -38,7 +42,10 @@ class AcademicService:
 
     def get_active_students_df(self) -> pd.DataFrame:
         query = "SELECT * FROM students WHERE status = 'Ativo'"
-        df = pd.read_sql(query, self.engine)
+        
+        with self.engine.connect() as conn:
+            df = pd.read_sql(query, conn)
+        
         if not df.empty:
             df['net_tuition'] = df['full_tuition'] - df['discount_value'] - df['scholarship_value']
             df['birth_date'] = pd.to_datetime(df['birth_date'], errors='coerce')
@@ -46,7 +53,10 @@ class AcademicService:
 
     def get_all_students_df(self) -> pd.DataFrame:
         query = "SELECT * FROM students"
-        df = pd.read_sql(query, self.engine)
+        
+         with self.engine.connect() as conn:
+            df = pd.read_sql(query, conn)
+        
         if not df.empty:
             df['net_tuition'] = df['full_tuition'] - df['discount_value'] - df['scholarship_value']
             df['entry_date'] = pd.to_datetime(df['entry_date'], errors='coerce')

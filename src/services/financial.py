@@ -13,7 +13,11 @@ class FinancialService:
         db_url = os.getenv("DATABASE_URL")
         if not db_url:
             raise ValueError("DATABASE_URL não encontrada no .env")
-        self.engine = create_engine(db_url)
+        self.engine = create_engine(
+            db_url,
+            pool_pre_ping=True,  # Checa se a conexão está viva antes de usar
+            pool_recycle=1800    # Recicla conexões a cada 30 minutos
+)
 
     def get_financial_summary(self, month: int, year: int = 2026) -> pd.DataFrame:
         query = f"""
@@ -24,7 +28,8 @@ class FinancialService:
               AND EXTRACT(YEAR FROM reference_date) = {year}
             GROUP BY status
         """
-        return pd.read_sql(query, self.engine)
+        with self.engine.connect() as conn:
+            return pd.read_sql(query, conn)
 
     def get_revenue_by_segment(self, df_active: pd.DataFrame) -> pd.DataFrame:
         if df_active.empty:
