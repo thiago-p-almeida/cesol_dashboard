@@ -1,195 +1,98 @@
-# CESOL Pro - Dashboard de Gestão Escolar v2.0
+> ⚠️ **Nota de Confidencialidade e Proteção de Dados:** Este repositório é um **Technical Showcase (Clone de Portfólio)** do sistema original. A aplicação hospedada na demonstração ao vivo utiliza **dados 100% sintéticos e fictícios** para preservar o sigilo do modelo de negócio e garantir conformidade com a LGPD. O código-fonte representa um estudo de caso arquitetural, mas sua propriedade intelectual pertence exclusivamente aos detentores dos direitos.
 
-Sistema de dashboard premium para gestão escolar, com interface moderna, temas Dark/Light e análises financeiras avançadas.
+<br>
 
-## ✨ Novidades da v2.0 Premium
+<div align="center">
+  <h1>🎓 CESOL Pro</h1>
+  <h3>Dashboard Premium de Gestão Escolar e Business Intelligence</h3>
+  
+  [![Python](https://img.shields.io/badge/Python-3.11+-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://python.org)
+  [![Streamlit](https://img.shields.io/badge/Streamlit-1.40+-FF4B4B?style=for-the-badge&logo=streamlit&logoColor=white)](https://streamlit.io)
+  [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-Database-4169E1?style=for-the-badge&logo=postgresql&logoColor=white)](https://postgresql.org)
+  [![Docker](https://img.shields.io/badge/Docker-Containerized-2496ED?style=for-the-badge&logo=docker&logoColor=white)](https://docker.com)
+  [![Fly.io](https://img.shields.io/badge/Fly.io-Cloud_Deployed-7b3b9b?style=for-the-badge&logo=flydotio&logoColor=white)](https://fly.io)
+</div>
 
-- 🎨 **UI Kit Premium**: Temas "Midnight Scholar" (Dark) e "Scholar Pro" (Light)
-- 🌓 **Toggle Dark/Light**: Alternância instantânea de temas
-- 📊 **Gráficos Animados**: Plotly com transições suaves
-- 🧭 **Navegação Lateral**: Menu hierárquico com streamlit-option-menu
-- 🎯 **Cards de Métricas**: KPIs com sombras, ícones e variações
-- 🚨 **Alertas Gerenciais**: Sistema de alertas com severidade
+<br>
 
-## 📁 Estrutura do Projeto (Clean Architecture)
+<div align="center">
+  <h2>🚀 <a href="https://cesol-pro.fly.dev/" target="_blank">Acessar Demonstração ao Vivo (Live Demo)</a></h2>
+  <p><i>O sistema pode levar alguns segundos para carregar no primeiro acesso devido à política de economia de recursos da nuvem (Cold Start).</i></p>
+</div>
 
-```text
-cesol_pro/
-├── config/                  
-│   └── expenses.json       # Configurações dinâmicas de custos (OCP)
-├── .streamlit/
-│   └── config.toml         # Configuração do Streamlit
-├── assets/                 # Estilos CSS (dark, light, global)
-├── components/             # Design System e Componentes UI
-│   ├── cards.py            # Cards de métricas
-│   ├── typography.py       # Renderizador de tipografia e HTML (DRY)
-│   └── ...
-├── utils/                  # Utilitários globais
-├── views/                  # Views modulares (Apresentação)
-│   ├── overview.py         # Dashboard principal
-│   ├── financial.py        # Análise financeira
-│   └── ...
-└── src/
-    ├── app/
-    │   └── main.py         # Entry point (Injeção de Dependências)
-    ├── services/           # Microsserviços de Domínio (SRP)
-    │   ├── academic.py     # Lógica de alunos e churn
-    │   ├── financial.py    # Lógica de receitas, custos e projeções
-    │   ├── exports.py      # Geração de arquivos (Excel)
-    │   └── ingestion.py    # Importação de dados
-    ├── schemas/            # Contratos de Validação (Pandera)
-    └── database/           # Modelos SQLAlchemy
-```
-## Padrões Arquiteturais Aplicados (v2.2)
+<br>
 
-Nesta versão, o sistema foi refatorado seguindo boas práticas de Engenharia de Software:
-* **SRP (Single Responsibility Principle):** Serviços segmentados por domínio (`academic.py`, `financial.py`, `exports.py`), eliminando "God Classes".
-* **OCP (Open-Closed Principle):** Parâmetros de negócio (como custos fixos) extraídos para `config/expenses.json`, permitindo alteração sem mexer no código Python.
-* **DRY (Don't Repeat Yourself):** Design System implementado em `components/typography.py` para centralizar a geração de HTML e garantir consistência visual.
+## 📌 O Desafio de Negócio (Business Case)
+Instituições de ensino lidam com alto volume de dados fragmentados. O **CESOL Pro** nasceu para resolver a "cegueira gerencial", consolidando informações financeiras, acadêmicas e de retenção de alunos em uma plataforma única. A ferramenta permite aos diretores tomarem decisões baseadas em dados reais de CAC (Custo de Aquisição), LTV (Lifetime Value), Taxas de Churn e Ocupação.
 
-## 🚀 Como Executar
+---
 
-### 1. Instalar Dependências
+## 📸 Visão Geral da Interface (Screenshots)
 
-```bash
-pip install -r requirements.txt
-```
+<div align="center">
+  <!-- Substitua os caminhos abaixo pelas suas imagens reais na pasta assets -->
+  <img src="https://via.placeholder.com/800x400/0F172A/F1F5F9?text=Dashboard+Principal+(Overview)" alt="Dashboard Principal" width="800">
+  <br><br>
+  <img src="https://via.placeholder.com/800x400/0F172A/10B981?text=Performance+Financeira+(Unit+Economics)" alt="Performance Financeira" width="800">
+</div>
 
-### 2. Configurar Variáveis de Ambiente
+---
 
-Crie um arquivo `.env` na raiz do projeto:
+## 🧠 Arquitetura e Engenharia de Software
+Este projeto foi desenhado focando em manutenibilidade e escalabilidade, fugindo do paradigma de "scripts espaguete" comum em projetos de análise de dados. 
 
-```env
-DATABASE_URL=postgresql://usuario:senha@localhost:5432/cesol_db
-```
+### 1. Padrões Arquiteturais Aplicados
+* **Clean Architecture:** Separação estrita entre a camada de Apresentação (`/views` e `/components`), Lógica de Negócios (`/services`) e Camada de Dados (`/database` e `/schemas`).
+* **Princípio SRP (Single Responsibility):** Lógicas segmentadas em microsserviços internos (ex: `academic.py` não lida com funções financeiras).
+* **Princípio OCP (Open-Closed):** Variáveis de negócio (como capacidade física da escola e custos base) isoladas em `/config/*.json`, permitindo alteração de regras sem necessidade de refatorar código Python.
+* **Injeção de Dependências:** Serviços são instanciados e injetados de forma controlada via `@st.cache_resource`, otimizando drasticamente o uso de memória RAM.
 
-### 3. Executar o Dashboard
+### 2. Infraestrutura (Cloud-Native)
+* **Containerização:** Totalmente isolado via `Dockerfile` otimizado e focado em performance (apenas 425MB de tamanho final da imagem).
+* **Gestão de Memória Virtual:** Configuração de alocação de *Swap file* interno no contêiner para prevenir travamentos por *OOM Kill* durante cálculos do Pandas.
+* **PostgreSQL Separado:** Banco de dados relacional apartado da aplicação, garantindo persistência e segurança.
 
-```bash
-cd cesol_pro
-streamlit run src/app/main.py
-```
+### 3. Data Quality & ETL
+* O módulo de Ingestão de Dados (via uploader de CSV) utiliza **Pandera** para tipagem rigorosa. Antes da inserção no Banco, o sistema traduz chaves, formata datas, normaliza erros ortográficos (ex: "Ensino Fundamental" -> "Fundamental I") e valida taxonomias relacionais.
 
-## 🎨 Sistema de Temas
+---
 
-### Tema Dark (Midnight Scholar)
-- **Background**: `#0F172A`
-- **Surface**: `#1E293B`
-- **Texto Principal**: `#F1F5F9`
-- **Texto Secundário**: `#94A3B8`
+## 🛠️ Stack Tecnológica
 
-### Tema Light (Scholar Pro)
-- **Background**: `#F8FAFC`
-- **Surface**: `#FFFFFF`
-- **Texto Principal**: `#0F172A`
-- **Texto Secundário**: `#475569`
+### Backend & Lógica
+- **Python 3.11:** Core language.
+- **Pandas & NumPy:** Processamento em lote, manipulação de dataframes e cálculos de BI.
+- **SQLAlchemy 2.0:** ORM robusto para transações no banco de dados.
+- **Pandera:** Validação estatística e garantias de contrato de dados (Data Quality).
 
-### Cores de Destaque
-- **Sucesso**: `#10B981`
-- **Info**: `#3B82F6`
-- **Aviso**: `#F59E0B`
-- **Perigo**: `#EF4444`
-- **Especial**: `#8B5CF6`
+### Frontend & UI/UX
+- **Streamlit:** Framework reativo com injeção de CSS *Custom properties* e *Atomic DOM*.
+- **Plotly Express:** Gráficos interativos, animados e polimórficos.
+- **Design System Propriedade:** Tema Dark/Light dinâmico com paleta semântica focada em UI/UX Premium.
 
-## 📊 Funcionalidades
+### DevOps & Deploy
+- **Docker:** Criação da imagem da aplicação.
+- **Fly.io:** Plataforma PaaS edge-network rodando micromaquinas virtuais de Linux.
+- **Neon / Fly Postgres:** Provisão do Banco de Dados SQL.
 
-### Dashboard Principal (Overview)
-- Resumo financeiro global
-- Receita, despesas e resultado líquido
-- Taxa de retenção
-- Distribuição por segmento
+---
 
-### Financeiro
-- Performance por segmento/série
-- Composição de custos (gráfico donut)
-- Receita por série (gráfico de barras)
-- Ticket médio e variações
+## 📊 Funcionalidades Principais (Features)
+- **Dashboard Global:** Cálculo em tempo real de Margem Operacional, Receita Total, Despesas Fixas e Saúde Financeira.
+- **Unit Economics:** Motor automatizado que cruza dados financeiros com marketing para calcular Custo de Aquisição (CAC) e LTV, retornando *insights* da saúde do investimento.
+- **Retenção & Churn:** Acompanhamento da taxa de evasão, gerando visões em *donut charts* dos motivos de saída e painéis de risco.
+- **Análise Pedagógica:** Identificação inteligente de "Distorção Idade-Série" baseada na taxonomia aprovada pelo MEC.
+- **Módulo de Projeção (Forecasting):** Gráfico preditivo (Área) simulando inadimplência (Slider dinâmico) vs. Receita Bruta/Líquida em até 24 meses futuros.
 
-### Retenção
-- Taxa de churn e retenção
-- Motivos de saída (gráfico de pizza)
-- Insights gerenciais
-- Alertas de evasão
+---
 
-### Projeções
-- Forecasting de receita
-- Simulação de inadimplência
-- Download em Excel
-- Gráfico de área com risco
+## ⚖️ Licença e Direitos Autorais
 
-### Administração
-- Upload de CSV de alunos
-- Validação de schema
-- Informações do sistema
-- Processamento de importações
+Copyright (c) 2026 CESOL Pro. Todos os direitos reservados.
 
-## 🧩 Componentes
+Este código-fonte é de propriedade exclusiva e confidencial. É estritamente proibida a cópia, reprodução, distribuição, comercialização ou modificação, parcial ou total, sem autorização prévia por escrito.
 
-### Cards de Métricas
-```python
-from components.cards import render_metric_card
-
-render_metric_card(
-    label="Receita Total",
-    value="R$ 125.450,00",
-    delta="↑ 12%",
-    delta_color="success",
-    icon="coins",
-    variant="success"
-)
-```
-
-### Gráficos Premium
-```python
-from components.charts import create_premium_pie, create_premium_bar
-
-# Gráfico de pizza/donut
-fig = create_premium_pie(data, values_col='valor', names_col='categoria')
-
-# Gráfico de barras
-fig = create_premium_bar(data, x_col='grade', y_col='net_tuition')
-```
-
-### Alertas
-```python
-from components.alerts import show_alert_premium, show_alert_container
-
-# Alerta individual
-show_alert_premium(
-    message="Margem operacional baixa",
-    alert_type="warning",
-    title="Atenção"
-)
-
-# Container de alertas
-show_alert_container(alerts_list, expanded=True)
-```
-
-## 🔧 Configuração
-
-### config.toml
-```toml
-[theme]
-primaryColor = "#10B981"
-backgroundColor = "#F8FAFC"
-secondaryBackgroundColor = "#FFFFFF"
-textColor = "#1E293B"
-font = "sans serif"
-
-[server]
-enableCORS = false
-enableXsrfProtection = true
-```
-
-## 📋 Requisitos
-
-- Python 3.9+
-- Streamlit 1.55.0
-- Plotly 6.6.0
-- SQLAlchemy 2.0
-- PostgreSQL
-
-## 📄 Licença
-
-CESOL Pro - Gestão Escolar Inteligente
-© 2024 CESOL Pro Team
+---
+<div align="center">
+  <small>Engenharia de Software e Data App desenvolvido por <a href="https://github.com/thiago-p-almeida">Thiago Almeida</a></small>
+</div>
