@@ -3,10 +3,7 @@
 <br>
 
 <div align="center">
-  <h1>
-    <img src="https://unpkg.com/lucide-static/icons/library-big.svg" width="36" style="vertical-align: middle; margin-right: 8px;">
-    CESOL Pro
-  </h1>
+  <h1>❖ CESOL Pro</h1>
   <h3>Dashboard Premium de Gestão Escolar e Business Intelligence</h3>
   
   [![Python](https://img.shields.io/badge/Python-3.11+-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://python.org)
