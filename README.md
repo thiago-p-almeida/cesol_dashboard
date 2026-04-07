@@ -4,7 +4,7 @@
 
 <div align="center">
   <h1>🎓 CESOL Pro</h1>
-  <h3>Dashboard Premium de Gestão Escolar e Business Intelligence</h3>
+  <h3>Dashboard de Gestão Escolar e Business Intelligence</h3>
   
   [![Python](https://img.shields.io/badge/Python-3.11+-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://python.org)
   [![Streamlit](https://img.shields.io/badge/Streamlit-1.40+-FF4B4B?style=for-the-badge&logo=streamlit&logoColor=white)](https://streamlit.io)
@@ -16,18 +16,18 @@
 <br>
 
 <div align="center">
-  <h2>🚀 <a href="https://cesol-pro.fly.dev/" target="_blank">Acessar Demonstração ao Vivo (Live Demo)</a></h2>
+  <h2>🌐 <a href="https://cesol-pro.fly.dev/" target="_blank">Acessar Demonstração ao Vivo (Live Demo)</a></h2>
   <p><i>O sistema pode levar alguns segundos para carregar no primeiro acesso devido à política de economia de recursos da nuvem (Cold Start).</i></p>
 </div>
 
 <br>
 
-## 📌 O Desafio de Negócio (Business Case)
+## ❖ O Desafio de Negócio (Business Case)
 Instituições de ensino lidam com alto volume de dados fragmentados. O **CESOL Pro** nasceu para resolver a "cegueira gerencial", consolidando informações financeiras, acadêmicas e de retenção de alunos em uma plataforma única. A ferramenta permite aos diretores tomarem decisões baseadas em dados reais de CAC (Custo de Aquisição), LTV (Lifetime Value), Taxas de Churn e Ocupação.
 
 ---
 
-## 📸 Visão Geral da Interface (Screenshots)
+## ⬚ Visão Geral da Interface (Screenshots)
 
 <div align="center">
   <!-- Substitua os caminhos abaixo pelas suas imagens reais na pasta assets -->
@@ -38,7 +38,7 @@ Instituições de ensino lidam com alto volume de dados fragmentados. O **CESOL 
 
 ---
 
-## 🧠 Arquitetura e Engenharia de Software
+## ⬢ Arquitetura e Engenharia de Software
 Este projeto foi desenhado focando em manutenibilidade e escalabilidade, fugindo do paradigma de "scripts espaguete" comum em projetos de análise de dados. 
 
 ### 1. Padrões Arquiteturais Aplicados
@@ -57,7 +57,7 @@ Este projeto foi desenhado focando em manutenibilidade e escalabilidade, fugindo
 
 ---
 
-## 🛠️ Stack Tecnológica
+## ⚙︎ Stack Tecnológica
 
 ### Backend & Lógica
 - **Python 3.11:** Core language.
@@ -77,7 +77,7 @@ Este projeto foi desenhado focando em manutenibilidade e escalabilidade, fugindo
 
 ---
 
-## 📊 Funcionalidades Principais (Features)
+## ◈ Funcionalidades Principais (Features)
 - **Dashboard Global:** Cálculo em tempo real de Margem Operacional, Receita Total, Despesas Fixas e Saúde Financeira.
 - **Unit Economics:** Motor automatizado que cruza dados financeiros com marketing para calcular Custo de Aquisição (CAC) e LTV, retornando *insights* da saúde do investimento.
 - **Retenção & Churn:** Acompanhamento da taxa de evasão, gerando visões em *donut charts* dos motivos de saída e painéis de risco.
@@ -86,7 +86,7 @@ Este projeto foi desenhado focando em manutenibilidade e escalabilidade, fugindo
 
 ---
 
-## ⚖️ Licença e Direitos Autorais
+## § Licença e Direitos Autorais
 
 Copyright (c) 2026 CESOL Pro. Todos os direitos reservados.
 
