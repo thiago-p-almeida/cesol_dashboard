@@ -42,10 +42,9 @@ class AcademicService:
 
     def get_active_students_df(self) -> pd.DataFrame:
         query = "SELECT * FROM students WHERE status = 'Ativo'"
-        
         with self.engine.connect() as conn:
             df = pd.read_sql(query, conn)
-        
+            
         if not df.empty:
             df['net_tuition'] = df['full_tuition'] - df['discount_value'] - df['scholarship_value']
             df['birth_date'] = pd.to_datetime(df['birth_date'], errors='coerce')
@@ -53,10 +52,9 @@ class AcademicService:
 
     def get_all_students_df(self) -> pd.DataFrame:
         query = "SELECT * FROM students"
-        
-            with self.engine.connect() as conn:
+        with self.engine.connect() as conn:
             df = pd.read_sql(query, conn)
-        
+            
         if not df.empty:
             df['net_tuition'] = df['full_tuition'] - df['discount_value'] - df['scholarship_value']
             df['entry_date'] = pd.to_datetime(df['entry_date'], errors='coerce')
