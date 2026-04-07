@@ -31,9 +31,9 @@ Instituições de ensino lidam com alto volume de dados fragmentados. O **CESOL 
 
 <div align="center">
   <!-- Substitua os caminhos abaixo pelas suas imagens reais na pasta assets -->
-  <img src="https://via.placeholder.com/800x400/0F172A/F1F5F9?text=Dashboard+Principal+(Overview)" alt="Dashboard Principal" width="800">
+  <img src="https://github.com/thiago-p-almeida/cesol_dashboard/blob/main/assets/dashboard.png" alt="Dashboard Principal" width="800">
   <br><br>
-  <img src="https://via.placeholder.com/800x400/0F172A/10B981?text=Performance+Financeira+(Unit+Economics)" alt="Performance Financeira" width="800">
+  <img src="https://github.com/thiago-p-almeida/cesol_dashboard/blob/main/assets/financeiro.png" alt="Performance Financeira" width="800">
 </div>
 
 ---
