@@ -54,7 +54,7 @@ class AcademicService:
     def get_all_students_df(self) -> pd.DataFrame:
         query = "SELECT * FROM students"
         
-         with self.engine.connect() as conn:
+            with self.engine.connect() as conn:
             df = pd.read_sql(query, conn)
         
         if not df.empty:
