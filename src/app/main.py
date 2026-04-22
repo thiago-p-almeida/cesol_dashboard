@@ -219,7 +219,11 @@ view_params = {
         "delinquency_rate": delinquency
     },
     "admin": {
-        "ingestor": ingestor
+        "ingestor": ingestor,
+        "export_svc": export_svc,               # O nosso gerador de Parquet
+        "df_active": df_all_active,             # Dados dos alunos ativos
+        "churn_data": churn_data,               # Dados de evasão
+        "expenses_summary": expenses_summary    # Dados financeiros
     },
 }
 
